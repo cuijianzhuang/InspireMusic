@@ -16,6 +16,14 @@ export default defineConfig({
         theme_color: '#000000',
         background_color: '#000000',
         display: 'standalone',
+        id: 'ins-music-202512',
+        start_url: '/',
+        dir: 'ltr',
+        lang: 'zh',
+        scope: '/',
+        orientation: 'natural',
+        display_override: ['standalone', 'window-controls-overlay'],
+        categories: ['music'],
         icons: [
           {
             src: 'android-chrome-192x192.png',
