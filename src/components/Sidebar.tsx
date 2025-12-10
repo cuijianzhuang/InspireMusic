@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, Library, Plus, ListMusic, Music2 } from 'lucide-react';
+import { Home, Search, Library, ListMusic } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { LocalPlaylist } from '../types';
 import { getGradientFromId } from '../utils/colors';
@@ -20,15 +20,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   playlists,
   activePlaylistId,
   onPlaylistSelect,
-  onCreatePlaylist,
 }) => {
   return (
     <div className="w-64 bg-black h-full flex flex-col p-4 gap-6 text-gray-400">
       <div className="flex flex-col gap-2">
         <div className="px-4 py-2 mb-2 text-white font-bold text-xl flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-            <Music2 size={24} className="text-black" />
-          </div>
+          <img src="/logo.svg" alt="Logo" className="w-10 h-10" />
           <span className="tracking-tight">InspireMusic</span>
         </div>
         <button
@@ -55,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="flex-1 flex flex-col gap-2 overflow-hidden">
         <div className="flex items-center justify-between px-4 py-2">
-          <button 
+          <button
             onClick={() => onTabChange('library')}
             className={clsx(
               "flex items-center gap-2 font-bold transition-colors",
@@ -63,17 +60,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           >
             <Library size={24} />
-            我的歌单
-          </button>
-          <button 
-            onClick={onCreatePlaylist}
-            className="p-1 hover:bg-surface rounded-full text-gray-400 hover:text-white transition-colors"
-            title="创建歌单"
-          >
-            <Plus size={20} />
+            音乐库
           </button>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {playlists.map((pl) => (
             <div

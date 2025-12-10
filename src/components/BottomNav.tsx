@@ -12,7 +12,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onTabChange,
 }) => {
   return (
-    <div className="md:hidden h-16 bg-black/95 backdrop-blur-lg border-t border-white/10 flex items-center justify-around px-4 z-50">
+    <div className="md:hidden h-16 bg-black/95 backdrop-blur-lg border-t border-white/10 flex items-center justify-around px-4 z-[70]">
       <button
         onClick={() => onTabChange('search')}
         className={clsx(
@@ -41,7 +41,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         )}
       >
         <Library size={24} />
-        <span className="text-xs font-medium">我的歌单</span>
+        <span className="text-xs font-medium">音乐库</span>
       </button>
     </div>
   );

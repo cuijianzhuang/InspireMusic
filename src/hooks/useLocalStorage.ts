@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const useLocalStorage = <T>(
   key: string,
   initialValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  useEffect(() => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      const raw = window.localStorage.getItem(key);
-      if (raw) {
-        setStoredValue(JSON.parse(raw) as T);
-      }
-    } catch {
-      setStoredValue(initialValue);
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.warn(`Error reading localStorage key "${key}":`, error);
+      return initialValue;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  });
 
   const setValue = (value: T | ((prev: T) => T)) => {
     setStoredValue((prev) => {

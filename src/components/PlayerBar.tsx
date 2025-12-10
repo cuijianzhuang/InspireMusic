@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, List, Mic2, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Song, Quality } from '../types';
+import type { Song } from '../types';
 import { Slider } from './ui/Slider';
 import { CoverImage } from './ui/CoverImage';
-import { Select } from './ui/Select';
 
 interface PlayerBarProps {
   currentSong: Song | null;
@@ -14,13 +13,11 @@ interface PlayerBarProps {
   duration: number;
   volume: number;
   playMode: 'list' | 'shuffle' | 'single';
-  quality: Quality;
   onPlayPause: () => void;
   onNext: () => void;
   onPrev: () => void;
   onSeek: (time: number) => void;
   onVolumeChange: (vol: number) => void;
-  onQualityChange: (q: Quality) => void;
   onToggleMode: () => void;
   onTogglePlaylist: () => void;
   onToggleLyrics: () => void;
@@ -44,13 +41,12 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   duration,
   volume,
   playMode,
-  quality,
   onPlayPause,
   onNext,
   onPrev,
   onSeek,
   onVolumeChange,
-  onQualityChange,
+
   onToggleMode,
   onTogglePlaylist,
   onToggleLyrics,
@@ -73,9 +69,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       <div className="flex items-center gap-2 md:gap-4 flex-1 md:w-[30%] md:min-w-[200px] overflow-hidden">
         {currentSong ? (
           <>
-            <CoverImage 
-              src={coverUrl || currentSong.pic} 
-              alt={currentSong.name} 
+            <CoverImage
+              src={coverUrl || currentSong.pic}
+              alt={currentSong.name}
               className="w-10 h-10 md:w-14 md:h-14 rounded shadow-md object-cover flex-shrink-0"
             />
             <div className="flex flex-col overflow-hidden min-w-0" onClick={onToggleLyrics}>
@@ -86,7 +82,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 {currentSong.artist}
               </span>
             </div>
-            <button 
+            <button
               onClick={onToggleFavorite}
               className={clsx("hidden md:block hover:scale-110 transition-transform", isFavorite ? "text-primary" : "text-gray-400 hover:text-white")}
             >
@@ -99,7 +95,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       {/* Desktop Controls */}
       <div className="hidden md:flex flex-col items-center gap-2 w-[40%] max-w-[600px]">
         <div className="flex items-center gap-6">
-          <button 
+          <button
             onClick={onToggleMode}
             className={clsx("text-gray-400 hover:text-white transition-colors", playMode !== 'list' && "text-primary")}
             title={playMode === 'shuffle' ? '随机播放' : playMode === 'single' ? '单曲循环' : '列表循环'}
@@ -109,7 +105,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           <button onClick={onPrev} className="text-gray-400 hover:text-white transition-colors">
             <SkipBack size={24} fill="currentColor" />
           </button>
-          <button 
+          <button
             onClick={onPlayPause}
             className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform"
           >
@@ -119,15 +115,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             <SkipForward size={24} fill="currentColor" />
           </button>
           <button className="text-gray-400 hover:text-white transition-colors opacity-0 cursor-default">
-             {/* Placeholder for symmetry */}
-             <Shuffle size={20} />
+            {/* Placeholder for symmetry */}
+            <Shuffle size={20} />
           </button>
         </div>
         <div className="flex items-center gap-2 w-full text-xs text-gray-400 font-mono">
           <span className="w-10 text-right">{formatTime(progress)}</span>
-          <Slider 
-            value={progress} 
-            max={duration || 100} 
+          <Slider
+            value={progress}
+            max={duration || 100}
             onChange={(e) => onSeek(Number(e.target.value))}
           />
           <span className="w-10">{formatTime(duration)}</span>
@@ -136,7 +132,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
       {/* Mobile Controls */}
       <div className="flex md:hidden items-center gap-3 mr-2">
-        <button 
+        <button
           onClick={onToggleFavorite}
           className={clsx("text-gray-400 hover:text-white transition-colors", isFavorite && "text-primary")}
         >
@@ -145,7 +141,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         <button onClick={onPrev} className="text-gray-400 hover:text-white transition-colors">
           <SkipBack size={20} fill="currentColor" />
         </button>
-        <button 
+        <button
           onClick={onPlayPause}
           className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform"
         >
@@ -154,13 +150,13 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         <button onClick={onNext} className="text-gray-400 hover:text-white transition-colors">
           <SkipForward size={20} fill="currentColor" />
         </button>
-        <button 
+        <button
           onClick={onToggleMode}
           className={clsx("text-gray-400 hover:text-white transition-colors", playMode !== 'list' && "text-primary")}
         >
           {playMode === 'shuffle' ? <Shuffle size={20} /> : playMode === 'single' ? <Repeat size={20} className="relative"><span className="absolute -top-1 -right-1 text-[8px]">1</span></Repeat> : <Repeat size={20} />}
         </button>
-        <button 
+        <button
           onClick={onTogglePlaylist}
           className="text-gray-400 hover:text-white transition-colors"
         >
@@ -170,26 +166,14 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
       {/* Right Section (Desktop) */}
       <div className="hidden md:flex items-center gap-4 w-[30%] justify-end">
-        <button 
+        <button
           onClick={onToggleLyrics}
           className={clsx("text-gray-400 hover:text-white transition-colors", showLyrics && "text-primary")}
           title="歌词"
         >
           <Mic2 size={20} />
         </button>
-        <Select
-          value={quality}
-          onChange={(val) => onQualityChange(val as Quality)}
-          options={[
-            { value: '128k', label: '标准' },
-            { value: '320k', label: '高品' },
-            { value: 'flac', label: '无损' },
-            { value: 'flac24bit', label: 'Hi-Res' },
-          ]}
-          className="w-24"
-          direction="up"
-        />
-        <button 
+        <button
           onClick={onTogglePlaylist}
           className="text-gray-400 hover:text-white transition-colors"
           title="播放队列"
@@ -200,9 +184,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           <button onClick={() => onVolumeChange(volume === 0 ? 0.8 : 0)}>
             {volume === 0 ? <VolumeX size={20} className="text-gray-400" /> : <Volume2 size={20} className="text-gray-400 group-hover:text-white" />}
           </button>
-          <Slider 
-            value={volume * 100} 
-            max={100} 
+          <Slider
+            value={volume * 100}
+            max={100}
             onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
             className="w-24"
           />
@@ -212,14 +196,14 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       {/* Mobile Progress Bar */}
       <div className="absolute bottom-0 left-0 right-0 h-[3px] md:hidden group">
         <div className="absolute inset-0 bg-gray-800" />
-        <div 
-            className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 pointer-events-none" 
-            style={{ width: `${((isDragging ? dragValue : progress) / (duration || 1)) * 100}%` }}
+        <div
+          className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 pointer-events-none"
+          style={{ width: `${((isDragging ? dragValue : progress) / (duration || 1)) * 100}%` }}
         />
-        
+
         {/* Time Preview Tooltip */}
         {isDragging && (
-          <div 
+          <div
             className="absolute bottom-6 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-medium px-2 py-1 rounded border border-white/10 backdrop-blur-sm shadow-xl pointer-events-none"
             style={{ left: `${(dragValue / (duration || 1)) * 100}%` }}
           >
