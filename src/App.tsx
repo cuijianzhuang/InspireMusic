@@ -10,6 +10,7 @@ import {
   searchSongs,
 } from './api';
 import useLocalStorage from './hooks/useLocalStorage';
+import { useMediaSession } from './hooks/useMediaSession';
 import type {
   Platform,
   Quality,
@@ -618,6 +619,22 @@ function App() {
       setLoadingToplists(false);
     }
   };
+
+  // Media Session API integration for browser/OS media notifications
+  useMediaSession({
+    title: currentSong?.name || '',
+    artist: currentSong?.artist || '',
+    album: currentSong?.album,
+    artwork: currentInfo?.pic,
+    duration,
+    position: progress,
+    isPlaying,
+    onPlay: togglePlayPause,
+    onPause: togglePlayPause,
+    onNextTrack: nextSong,
+    onPrevTrack: prevSong,
+    onSeek: handleSeek,
+  });
 
   return (
     <Layout
