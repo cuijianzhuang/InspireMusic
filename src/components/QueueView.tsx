@@ -10,6 +10,7 @@ interface QueueViewProps {
   onRemove: (index: number) => void;
   onClose: () => void;
   onClear: () => void;
+  requestClose?: boolean; // 外部请求关闭，用于触发退出动画
 }
 
 export const QueueView: React.FC<QueueViewProps> = ({
@@ -19,6 +20,7 @@ export const QueueView: React.FC<QueueViewProps> = ({
   onRemove,
   onClose,
   onClear,
+  requestClose,
 }) => {
   const [confirmClear, setConfirmClear] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -54,6 +56,12 @@ export const QueueView: React.FC<QueueViewProps> = ({
     };
   }, []);
 
+  // 外部请求关闭时触发退出动画
+  useEffect(() => {
+    if (requestClose && !isClosing) {
+      handleClose();
+    }
+  }, [requestClose, isClosing, handleClose]);
   return (
     <>
       {/* Backdrop */}

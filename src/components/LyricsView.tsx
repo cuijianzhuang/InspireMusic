@@ -13,6 +13,7 @@ interface LyricsViewProps {
   error?: string | null;
   onClose: () => void;
   onSeek?: (time: number) => void;
+  requestClose?: boolean; // 外部请求关闭，用于触发退出动画
 }
 
 export const LyricsView: React.FC<LyricsViewProps> = ({
@@ -24,6 +25,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   error,
   onClose,
   onSeek,
+  requestClose,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const lyricRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -75,24 +77,24 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   const scrollToActiveLyric = useCallback((index: number, smooth = true) => {
     const container = containerRef.current;
     const activeElement = lyricRefs.current.get(index);
-    
+
     if (!container || !activeElement) return;
 
     const containerHeight = container.clientHeight;
     const elementTop = activeElement.offsetTop;
     const elementHeight = activeElement.offsetHeight;
-    
+
     // Calculate target scroll position to center the element
     const targetScrollTop = elementTop - (containerHeight / 2) + (elementHeight / 2);
-    
+
     // Mark as auto-scrolling to prevent triggering user scroll detection
     isAutoScrollingRef.current = true;
-    
+
     container.scrollTo({
       top: Math.max(0, targetScrollTop),
       behavior: smooth ? 'smooth' : 'auto',
     });
-    
+
     // Reset auto-scrolling flag after animation completes
     setTimeout(() => {
       isAutoScrollingRef.current = false;
@@ -104,11 +106,11 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     // User is actively scrolling with mouse wheel
     setUserScrolling(true);
     setShowScrollButton(true);
-    
+
     if (userScrollTimeoutRef.current) {
       clearTimeout(userScrollTimeoutRef.current);
     }
-    
+
     userScrollTimeoutRef.current = setTimeout(() => {
       setUserScrolling(false);
       setShowScrollButton(false);
@@ -138,7 +140,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   useEffect(() => {
     if (activeLyricIndex >= 0 && activeLyricIndex !== lastActiveLyricIndexRef.current) {
       lastActiveLyricIndexRef.current = activeLyricIndex;
-      
+
       if (!userScrolling) {
         scrollToActiveLyric(activeLyricIndex, true);
       }
@@ -171,8 +173,15 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     setTimeout(onClose, 300);
   }, [onClose]);
 
+  // 外部请求关闭时触发退出动画
+  useEffect(() => {
+    if (requestClose && isVisible) {
+      handleClose();
+    }
+  }, [requestClose, isVisible, handleClose]);
+
   return (
-    <div 
+    <div
       className={clsx(
         "fixed inset-0 bg-gradient-to-b from-gray-900 to-black z-40 flex flex-col transition-all duration-300 ease-out",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
@@ -180,7 +189,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     >
       {/* Header */}
       <div className="flex items-center justify-between px-8 py-6">
-        <button 
+        <button
           onClick={handleClose}
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
         >
@@ -197,16 +206,16 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       <div className="flex-1 flex overflow-hidden pb-24">
         {/* Left: Cover Art (Desktop) */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-12">
-          <div 
+          <div
             key={currentSong?.id}
             className={clsx(
               "w-full max-w-md aspect-square transition-all duration-500 ease-out",
               isVisible ? "scale-100 opacity-100" : "scale-90 opacity-0"
             )}
           >
-            <CoverImage 
-              src={coverUrl || currentSong?.pic} 
-              alt={currentSong?.name} 
+            <CoverImage
+              src={coverUrl || currentSong?.pic}
+              alt={currentSong?.name}
               className="w-full h-full object-cover rounded-lg shadow-2xl"
             />
           </div>
@@ -223,15 +232,15 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
             }}
             className={clsx(
               "absolute bottom-24 right-6 z-20 p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl hover:bg-white/20 transition-all duration-200",
-              showScrollButton && activeLyricIndex >= 0 
-                ? "opacity-100 scale-100" 
+              showScrollButton && activeLyricIndex >= 0
+                ? "opacity-100 scale-100"
                 : "opacity-0 scale-80 pointer-events-none"
             )}
           >
             <AudioLines size={24} fill="currentColor" />
           </button>
-          
-          <div 
+
+          <div
             ref={containerRef}
             onWheel={handleWheel}
             onTouchStart={handleTouchStart}
@@ -247,7 +256,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
               lyrics.map((line, index) => {
                 const isActive = index === activeLyricIndex;
                 const isPast = index < activeLyricIndex;
-                
+
                 return (
                   <div
                     key={index}
@@ -264,24 +273,24 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                     onClick={() => handleLyricClick(line.time)}
                   >
                     {/* Main lyric text */}
-                    <div 
+                    <div
                       className={clsx(
                         "leading-relaxed transition-colors duration-200",
-                        isActive 
-                          ? "text-2xl md:text-3xl lg:text-4xl font-bold text-primary" 
+                        isActive
+                          ? "text-2xl md:text-3xl lg:text-4xl font-bold text-primary"
                           : "text-xl md:text-2xl lg:text-3xl font-medium text-white",
                         !isActive && "hover:text-primary/70"
                       )}
                     >
                       {line.text}
                     </div>
-                    
+
                     {/* Translation text */}
                     {line.translation && (
-                      <div 
+                      <div
                         className={clsx(
                           "mt-2 leading-relaxed transition-colors duration-200",
-                          isActive 
+                          isActive
                             ? "text-base md:text-lg lg:text-xl text-primary/80 font-medium"
                             : "text-sm md:text-base lg:text-lg text-white/60 font-normal",
                         )}

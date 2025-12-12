@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, List, Mic2, Heart } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, List, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { Song } from '../types';
 import { Slider } from './ui/Slider';
@@ -23,7 +23,6 @@ interface PlayerBarProps {
   onToggleLyrics: () => void;
   onToggleFavorite: () => void;
   isFavorite: boolean;
-  showLyrics: boolean;
 }
 
 const formatTime = (seconds: number) => {
@@ -52,7 +51,6 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onToggleLyrics,
   onToggleFavorite,
   isFavorite,
-  showLyrics,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragValue, setDragValue] = useState(0);
@@ -69,11 +67,13 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       <div className="flex items-center gap-2 md:gap-4 flex-1 md:w-[30%] md:min-w-[200px] overflow-hidden">
         {currentSong ? (
           <>
-            <CoverImage
-              src={coverUrl || currentSong.pic}
-              alt={currentSong.name}
-              className="w-10 h-10 md:w-14 md:h-14 rounded shadow-md object-cover flex-shrink-0"
-            />
+            <div onClick={onToggleLyrics} className="cursor-pointer flex-shrink-0">
+              <CoverImage
+                src={coverUrl || currentSong.pic}
+                alt={currentSong.name}
+                className="w-10 h-10 md:w-14 md:h-14 rounded shadow-md object-cover"
+              />
+            </div>
             <div className="flex flex-col overflow-hidden min-w-0" onClick={onToggleLyrics}>
               <span className="text-white text-xs md:text-sm font-medium truncate hover:underline cursor-pointer">
                 {currentSong.name}
@@ -132,6 +132,18 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
       {/* Mobile Controls */}
       <div className="flex md:hidden items-center gap-3 mr-2">
+        {/* Volume Control for Mobile */}
+        <div className="flex items-center gap-1">
+          <button onClick={() => onVolumeChange(volume === 0 ? 0.8 : 0)}>
+            {volume === 0 ? <VolumeX size={20} className="text-gray-400" /> : <Volume2 size={20} className="text-gray-400" />}
+          </button>
+          <Slider
+            value={volume * 100}
+            max={100}
+            onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
+            className="w-14"
+          />
+        </div>
         <button
           onClick={onToggleFavorite}
           className={clsx("text-gray-400 hover:text-white transition-colors", isFavorite && "text-primary")}
@@ -166,13 +178,6 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
       {/* Right Section (Desktop) */}
       <div className="hidden md:flex items-center gap-4 w-[30%] justify-end">
-        <button
-          onClick={onToggleLyrics}
-          className={clsx("text-gray-400 hover:text-white transition-colors", showLyrics && "text-primary")}
-          title="歌词"
-        >
-          <Mic2 size={20} />
-        </button>
         <button
           onClick={onTogglePlaylist}
           className="text-gray-400 hover:text-white transition-colors"

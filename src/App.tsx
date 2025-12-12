@@ -130,6 +130,8 @@ function App() {
   const [activeTab, setActiveTab] = useState<'search' | 'toplists' | 'library' | 'playlist'>('search');
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
+  const [requestCloseLyrics, setRequestCloseLyrics] = useState(false); // 用于触发退出动画
+  const [requestCloseQueue, setRequestCloseQueue] = useState(false); // 用于触发退出动画
   const [viewingPlaylist, setViewingPlaylist] = useState<LocalPlaylist | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isCreatePlaylistModalOpen, setIsCreatePlaylistModalOpen] = useState(false);
@@ -755,8 +757,13 @@ function App() {
           activeTab={activeTab}
           onTabChange={(tab) => {
             setActiveTab(tab);
-            setShowQueue(false);
-            setShowLyrics(false); // 移动端切换页面时自动收起歌词
+            // 移动端切换页面时自动收起歌词和播放队列（带动画）
+            if (showQueue) {
+              setRequestCloseQueue(true);
+            }
+            if (showLyrics) {
+              setRequestCloseLyrics(true);
+            }
           }}
         />
       }
@@ -787,14 +794,31 @@ function App() {
             setPlayMode(next);
           }}
           onTogglePlaylist={() => {
-            // PC端点击播放队列时自动收起歌词
+            // 点击播放队列时自动收起歌词（带动画）
             if (showLyrics) {
-              setShowLyrics(false);
+              setRequestCloseLyrics(true);
             }
-            setShowQueue(!showQueue);
+            if (showQueue) {
+              // 关闭队列
+              setRequestCloseQueue(true);
+            } else {
+              // 打开队列
+              setShowQueue(true);
+            }
           }}
-          onToggleLyrics={() => setShowLyrics(!showLyrics)}
-          showLyrics={showLyrics}
+          onToggleLyrics={() => {
+            // 展开歌词时自动收起播放队列（带动画）
+            if (showQueue) {
+              setRequestCloseQueue(true);
+            }
+            if (showLyrics) {
+              // 关闭歌词
+              setRequestCloseLyrics(true);
+            } else {
+              // 打开歌词
+              setShowLyrics(true);
+            }
+          }}
         />
       }
       lyricsOverlay={
@@ -806,7 +830,11 @@ function App() {
             coverUrl={currentInfo?.pic}
             loading={lyricsLoading}
             error={infoError}
-            onClose={() => setShowLyrics(false)}
+            requestClose={requestCloseLyrics}
+            onClose={() => {
+              setShowLyrics(false);
+              setRequestCloseLyrics(false);
+            }}
             onSeek={handleSeek}
           />
         )
@@ -975,6 +1003,7 @@ function App() {
         <QueueView
           queue={queue}
           currentIndex={queueIndex}
+          requestClose={requestCloseQueue}
           onPlay={(index) => {
             shouldAutoPlayRef.current = true;
             setQueueIndex(index);
@@ -1006,7 +1035,10 @@ function App() {
               }
             }
           }}
-          onClose={() => setShowQueue(false)}
+          onClose={() => {
+            setShowQueue(false);
+            setRequestCloseQueue(false);
+          }}
           onClear={() => {
             if (audioRef.current) {
               audioRef.current.pause();
