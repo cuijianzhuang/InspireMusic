@@ -15,7 +15,7 @@ export default defineConfig({
         description: 'A modern music player',
         theme_color: '#000000',
         background_color: '#000000',
-        display: 'standalone',
+        display: 'fullscreen',
         id: 'ins-music-202512',
         start_url: '/',
         dir: 'ltr',
