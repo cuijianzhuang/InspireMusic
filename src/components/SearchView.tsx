@@ -6,6 +6,7 @@ import { SEARCH_SOURCE_OPTIONS_DESKTOP, SEARCH_SOURCE_OPTIONS_MOBILE } from '../
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { SongListPanel } from './ui/SongListPanel';
 import { useConfirmDialog } from '../hooks/useConfirmDialog';
+import { PageLayout } from './ui/PageLayout';
 
 interface SearchViewProps {
   keyword: string;
@@ -101,7 +102,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
   const showResultsPanel = keyword.trim() && (loading || total !== undefined || results.length > 0);
 
   return (
-    <div className="p-4 md:p-8">
+    <PageLayout className="pt-4 md:pt-8">
       <div className="md:hidden flex items-center gap-3 mb-6 px-2">
         <img src="/logo.svg" alt="Logo" className="w-8 h-8" />
         <span className="text-white font-bold text-lg tracking-tight">InspireMusic</span>
@@ -273,6 +274,6 @@ export const SearchView: React.FC<SearchViewProps> = ({
           </p>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };

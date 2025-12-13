@@ -4,6 +4,7 @@ import { Trophy } from 'lucide-react';
 import { getGradientFromId } from '../utils/colors';
 import { CoverCard } from './ui/CoverCard';
 import { CoverGrid } from './ui/CoverGrid';
+import { PageLayout } from './ui/PageLayout';
 
 interface ToplistsViewProps {
   toplists: ToplistSummary[];
@@ -12,8 +13,7 @@ interface ToplistsViewProps {
 
 export const ToplistsView: React.FC<ToplistsViewProps> = ({ toplists, onSelect }) => {
   return (
-    <div className="p-4 md:p-8">
-      <h2 className="text-2xl font-bold text-white mb-6">排行榜</h2>
+    <PageLayout title="排行榜">
       <CoverGrid className="xl:grid-cols-5">
         {toplists.map((list) => (
           <CoverCard
@@ -29,6 +29,6 @@ export const ToplistsView: React.FC<ToplistsViewProps> = ({ toplists, onSelect }
           />
         ))}
       </CoverGrid>
-    </div>
+    </PageLayout>
   );
 };

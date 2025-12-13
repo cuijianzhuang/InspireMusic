@@ -7,6 +7,7 @@ import { getGradientFromId } from '../utils/colors';
 import { FAVORITES_ID, FAVORITES_NAME, getPlaylistCover } from '../utils/playlists';
 import { PLATFORM_LABELS } from '../utils/platform';
 import { buildFileUrl } from '../api';
+import { PageLayout } from './ui/PageLayout';
 
 interface PlaylistDetailViewProps {
   playlist: LocalPlaylist;
@@ -35,7 +36,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
     : getGradientFromId(playlist.id);
 
   return (
-    <div className="p-4 md:p-8">
+    <PageLayout>
       <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-6 md:mb-8">
         <div className={`w-32 h-32 md:w-52 md:h-52 shadow-2xl rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 ${coverContainerClass}`}>
           {isFavorites ? (
@@ -116,6 +117,6 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
         isPlaying={isPlaying}
         onPlay={onPlay}
       />
-    </div>
+    </PageLayout>
   );
 };

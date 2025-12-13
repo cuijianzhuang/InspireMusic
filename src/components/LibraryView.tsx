@@ -5,6 +5,7 @@ import { SleepTimerSection } from './library/SleepTimerSection';
 import { ImportPlaylistSection } from './library/ImportPlaylistSection';
 import { PlaylistGrid } from './library/PlaylistGrid';
 import { ClearCacheSection } from './library/ClearCacheSection';
+import { PageLayout } from './ui/PageLayout';
 
 interface LibraryViewProps {
     playlists: LocalPlaylist[];
@@ -42,11 +43,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     onCancelSleepTimer
 }) => {
     return (
-        <div className="p-4 md:p-8">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">音乐库</h2>
-            </div>
-
+        <PageLayout title="音乐库">
             {/* Settings Section */}
             <div className="bg-surface p-4 md:p-6 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <QualitySettingsSection
@@ -78,6 +75,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 onPlayPlaylist={onPlayPlaylist}
                 onCreatePlaylist={onCreatePlaylist}
             />
-        </div>
+        </PageLayout>
     );
 };
