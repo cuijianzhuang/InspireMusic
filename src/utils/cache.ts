@@ -312,12 +312,8 @@ if (typeof window !== 'undefined') {
  * @returns 清理结果统计
  */
 export const clearUserData = (): { clearedCount: number; totalSize: number } => {
-  // 需要清除的用户数据键（保留收藏、歌单、音质设置）
+  // 需要单独清除的用户数据键
   const clearKeys = [
-    'inspire-volume',
-    'inspire-queue',
-    'inspire-queue-index',
-    'inspire-progress',
     'search-history',
   ];
 
@@ -344,6 +340,41 @@ export const clearUserData = (): { clearedCount: number; totalSize: number } => 
     }
   }
 
+  // 处理 zustand persist 存储的状态
+  // 清除播放队列、播放进度，保留 favorites、playlists、quality、volume、playMode
+  const STORE_KEY = 'inspire-music-store';
+  try {
+    const storeItem = localStorage.getItem(STORE_KEY);
+    if (storeItem) {
+      totalSize += estimateSize(storeItem);
+      clearedCount++;
+
+      const storeData = JSON.parse(storeItem);
+      if (storeData && storeData.state) {
+        // 保留需要的状态，清除播放相关状态
+        const newState = {
+          ...storeData,
+          state: {
+            // 保留的状态
+            favorites: storeData.state.favorites || [],
+            playlists: storeData.state.playlists || [],
+            quality: storeData.state.quality || '320k',
+            volume: storeData.state.volume ?? 0.8,
+            playMode: storeData.state.playMode || 'list',
+            // 清除的状态（重置为默认值）
+            currentSong: null,
+            queue: [],
+            queueIndex: -1,
+            savedProgress: 0,
+          }
+        };
+        localStorage.setItem(STORE_KEY, JSON.stringify(newState));
+      }
+    }
+  } catch {
+    // 如果解析失败，不做处理
+  }
+
   return { clearedCount, totalSize };
 };
 
@@ -352,10 +383,6 @@ export const clearUserData = (): { clearedCount: number; totalSize: number } => 
  */
 export const getClearableDataStats = (): { count: number; size: number } => {
   const clearKeys = [
-    'inspire-volume',
-    'inspire-queue',
-    'inspire-queue-index',
-    'inspire-progress',
     'search-history',
   ];
 
@@ -378,6 +405,27 @@ export const getClearableDataStats = (): { count: number; size: number } => {
     } catch {
       // Ignore
     }
+  }
+
+  // zustand persist 存储统计（只统计将被清除的部分）
+  const STORE_KEY = 'inspire-music-store';
+  try {
+    const storeItem = localStorage.getItem(STORE_KEY);
+    if (storeItem) {
+      const storeData = JSON.parse(storeItem);
+      if (storeData && storeData.state) {
+        // 估算将被清除的数据大小
+        const { currentSong, queue, savedProgress } = storeData.state;
+        if (currentSong || (queue && queue.length > 0) || savedProgress > 0) {
+          // 粗略估算可清除数据的大小
+          const clearableData = { currentSong, queue, savedProgress };
+          size += estimateSize(JSON.stringify(clearableData));
+          count++;
+        }
+      }
+    }
+  } catch {
+    // Ignore
   }
 
   return { count, size };

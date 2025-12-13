@@ -11,7 +11,9 @@ export function usePlayer() {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const animationFrameRef = useRef<number | null>(null);
     const lastProgressRef = useRef(0);
+    const lastSaveTimeRef = useRef(0);
     const shouldAutoPlayRef = useRef(false);
+    const resumeHappenedRef = useRef(false);
     const playModeRef = useRef<'list' | 'shuffle' | 'single'>('list');
     const queueRef = useRef<Song[]>([]);
     const queueIndexRef = useRef(-1);
@@ -28,6 +30,7 @@ export function usePlayer() {
         playMode,
         quality,
         sleepEndTime,
+        savedProgress,
         setCurrentSong,
         setCurrentInfo,
         setIsPlaying,
@@ -40,6 +43,7 @@ export function usePlayer() {
         setLyricsLoading,
         setInfoError,
         setSleepEndTime,
+        saveProgress,
     } = useAppStore();
 
     // Keep refs in sync
@@ -67,6 +71,12 @@ export function usePlayer() {
                 if (Math.abs(currentTime - lastProgressRef.current) > 0.05) {
                     lastProgressRef.current = currentTime;
                     setProgress(currentTime);
+                    // 每 5 秒保存一次播放进度
+                    const now = Date.now();
+                    if (now - lastSaveTimeRef.current > 5000) {
+                        lastSaveTimeRef.current = now;
+                        saveProgress(currentTime);
+                    }
                 }
             }
             animationFrameRef.current = requestAnimationFrame(updateProgress);
@@ -137,6 +147,23 @@ export function usePlayer() {
         const audio = audioRef.current;
         const src = buildFileUrl(currentSong.platform, currentSong.id, 'url', quality);
         audio.src = src;
+
+        // 恢复播放进度（仅在应用启动时恢复一次）
+        if (!resumeHappenedRef.current && savedProgress > 0) {
+            resumeHappenedRef.current = true;
+            // 等待音频加载完成后再 seek
+            const handleCanPlay = () => {
+                if (audio.duration && savedProgress < audio.duration) {
+                    audio.currentTime = savedProgress;
+                    setProgress(savedProgress);
+                    lastProgressRef.current = savedProgress;
+                }
+                // 清除已保存的进度，避免下次切歌时跳转
+                saveProgress(0);
+                audio.removeEventListener('canplay', handleCanPlay);
+            };
+            audio.addEventListener('canplay', handleCanPlay);
+        }
 
         if (shouldAutoPlayRef.current) {
             audio.play().catch(() => setIsPlaying(false));
