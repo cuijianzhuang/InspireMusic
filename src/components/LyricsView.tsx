@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
-import type { ParsedLyricLine, Song, Quality } from '../types';
+import type { ParsedLyricLine, Song } from '../types';
 import { ChevronDown, AudioLines } from 'lucide-react';
 import { clsx } from 'clsx';
 import { CoverImage } from './ui/CoverImage';

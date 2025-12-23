@@ -1,7 +1,7 @@
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, List, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Song, Quality } from '../types';
+import type { Song } from '../types';
 import { Slider } from './ui/Slider';
 import { CoverImage } from './ui/CoverImage';
 import { Download } from 'lucide-react';
