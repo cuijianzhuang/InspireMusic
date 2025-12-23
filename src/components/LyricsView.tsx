@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
-import type { ParsedLyricLine, Song } from '../types';
+import type { ParsedLyricLine, Song, Quality } from '../types';
 import { ChevronDown, AudioLines } from 'lucide-react';
 import { clsx } from 'clsx';
 import { CoverImage } from './ui/CoverImage';
 import { useOverlayVisibility } from '../hooks/useOverlayVisibility';
+import { Download } from 'lucide-react';
 
 interface LyricsViewProps {
   lyrics: ParsedLyricLine[];
@@ -14,6 +15,7 @@ interface LyricsViewProps {
   error?: string | null;
   onClose: () => void;
   onSeek?: (time: number) => void;
+  onDownload?: (song: Song) => void;
   requestClose?: boolean; // 外部请求关闭，用于触发退出动画
 }
 
@@ -26,6 +28,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   error,
   onClose,
   onSeek,
+  onDownload,
   requestClose,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -184,7 +187,17 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
           <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">Now Playing</div>
           <div className="font-bold text-white">{currentSong?.name}</div>
         </div>
-        <div className="w-12" /> {/* Spacer */}
+        {currentSong && onDownload ? (
+          <button
+            onClick={() => onDownload(currentSong)}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            title="下载"
+          >
+            <Download size={24} />
+          </button>
+        ) : (
+          <div className="w-12" />
+        )}
       </div>
 
       {/* Content */}

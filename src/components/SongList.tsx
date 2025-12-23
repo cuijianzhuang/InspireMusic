@@ -5,12 +5,14 @@ import { clsx } from 'clsx';
 import type { Song, Platform } from '../types';
 import { CoverImage } from './ui/CoverImage';
 import { PLATFORM_BADGE_CLASSNAMES, PLATFORM_LABELS } from '../utils/platform';
+import { Download } from 'lucide-react';
 
 interface SongListProps {
   songs: Song[];
   currentSong: Song | null;
   isPlaying: boolean;
   onPlay: (song: Song) => void;
+  onDownload?: (song: Song) => void;
   showHeader?: boolean;
   indexOffset?: number;
 }
@@ -29,9 +31,10 @@ interface SongRowProps {
   isCurrent: boolean;
   isPlaying: boolean;
   onPlay: (song: Song) => void;
+  onDownload?: (song: Song) => void;
 }
 
-const SongRow = memo<SongRowProps>(({ song, index, isCurrent, isPlaying, onPlay }) => {
+const SongRow = memo<SongRowProps>(({ song, index, isCurrent, isPlaying, onPlay, onDownload }) => {
   const handleDoubleClick = useCallback(() => onPlay(song), [onPlay, song]);
   const handleClick = useCallback(() => {
     if (window.innerWidth < 768) {
@@ -42,6 +45,10 @@ const SongRow = memo<SongRowProps>(({ song, index, isCurrent, isPlaying, onPlay 
     e.stopPropagation();
     onPlay(song);
   }, [onPlay, song]);
+  const handleDownloadClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDownload?.(song);
+  }, [onDownload, song]);
 
   return (
     <div
@@ -95,7 +102,16 @@ const SongRow = memo<SongRowProps>(({ song, index, isCurrent, isPlaying, onPlay 
       </div>
       <div className="hidden md:block truncate hover:text-white hover:underline">{song.artist}</div>
       <div className="hidden md:block truncate hover:text-white hover:underline">{song.album || '-'}</div>
-      <div className="hidden md:flex justify-end">
+      <div className="hidden md:flex items-center justify-end gap-2">
+        {onDownload && (
+          <button
+            onClick={handleDownloadClick}
+            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primary transition-all"
+            title="下载"
+          >
+            <Download size={16} />
+          </button>
+        )}
         <PlatformBadge platform={song.platform} />
       </div>
     </div>
@@ -133,6 +149,7 @@ export const SongList: React.FC<SongListProps> = memo(({
   currentSong,
   isPlaying,
   onPlay,
+  onDownload,
   showHeader = true,
   indexOffset = 0,
 }) => {
@@ -185,6 +202,7 @@ export const SongList: React.FC<SongListProps> = memo(({
                 isCurrent={isCurrent}
                 isPlaying={isPlaying && isCurrent}
                 onPlay={onPlay}
+                onDownload={onDownload}
               />
             );
           })}
@@ -234,6 +252,7 @@ export const SongList: React.FC<SongListProps> = memo(({
                   isCurrent={isCurrent}
                   isPlaying={isPlaying && isCurrent}
                   onPlay={onPlay}
+                  onDownload={onDownload}
                 />
               </div>
             );

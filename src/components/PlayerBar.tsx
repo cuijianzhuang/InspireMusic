@@ -1,9 +1,10 @@
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, List, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Song } from '../types';
+import type { Song, Quality } from '../types';
 import { Slider } from './ui/Slider';
 import { CoverImage } from './ui/CoverImage';
+import { Download } from 'lucide-react';
 
 interface PlayerBarProps {
   currentSong: Song | null;
@@ -22,6 +23,7 @@ interface PlayerBarProps {
   onTogglePlaylist: () => void;
   onToggleLyrics: () => void;
   onToggleFavorite: () => void;
+  onDownload?: () => void;
   isFavorite: boolean;
 }
 
@@ -50,6 +52,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onTogglePlaylist,
   onToggleLyrics,
   onToggleFavorite,
+  onDownload,
   isFavorite,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -93,6 +96,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             >
               <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
             </button>
+            {onDownload && (
+              <button
+                onClick={onDownload}
+                className="hidden md:block hover:scale-110 transition-transform text-gray-400 hover:text-white"
+                title="下载"
+              >
+                <Download size={18} />
+              </button>
+            )}
           </>
         ) : null}
       </div>
@@ -155,6 +167,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         >
           <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
         </button>
+        {onDownload && (
+          <button
+            onClick={onDownload}
+            className="text-gray-400 hover:text-white transition-colors"
+            title="下载"
+          >
+            <Download size={20} />
+          </button>
+        )}
         <button onClick={onPrev} className="text-gray-400 hover:text-white transition-colors">
           <SkipBack size={20} fill="currentColor" />
         </button>

@@ -7,6 +7,7 @@ interface SongListPanelProps {
   currentSong: Song | null;
   isPlaying: boolean;
   onPlay: (song: Song) => void;
+  onDownload?: (song: Song) => void;
   indexOffset?: number;
   footer?: React.ReactNode;
 }
@@ -20,6 +21,7 @@ export const SongListPanel: React.FC<SongListPanelProps> = ({
   currentSong,
   isPlaying,
   onPlay,
+  onDownload,
   indexOffset,
   footer,
 }) => {
@@ -30,6 +32,7 @@ export const SongListPanel: React.FC<SongListPanelProps> = ({
         currentSong={currentSong}
         isPlaying={isPlaying}
         onPlay={onPlay}
+        onDownload={onDownload}
         indexOffset={indexOffset}
       />
       {footer && <div className="p-4 border-t border-white/5">{footer}</div>}

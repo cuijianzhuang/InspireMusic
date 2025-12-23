@@ -20,6 +20,7 @@ interface SearchViewProps {
   currentSong: Song | null;
   isPlaying: boolean;
   onPlay: (song: Song) => void;
+  onDownload?: (song: Song) => void;
   onClear: () => void;
   page: number;
   limit: number;
@@ -59,6 +60,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
   currentSong,
   isPlaying,
   onPlay,
+  onDownload,
   onClear,
   page,
   limit,
@@ -174,6 +176,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
           currentSong={currentSong}
           isPlaying={isPlaying}
           onPlay={onPlay}
+          onDownload={onDownload}
           indexOffset={(page - 1) * limit}
           footer={(
             <div className="flex items-center justify-center gap-2">

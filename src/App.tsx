@@ -35,6 +35,8 @@ import { ToastContainer } from './components/ui/Toast';
 import type { ToastMessage } from './components/ui/Toast';
 import { Select } from './components/ui/Select';
 import { ListMusic, Heart, Check } from 'lucide-react';
+import { downloadSong } from './utils/download';
+import { DownloadDialog } from './components/DownloadDialog';
 
 import { getGradientFromId } from './utils/colors';
 import { parseLyrics } from './utils/lyrics';
@@ -69,6 +71,8 @@ function App() {
   const [renamePlaylistName, setRenamePlaylistName] = useState('');
   const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
   const [songToAddToPlaylist, setSongToAddToPlaylist] = useState<Song | null>(null);
+  const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
+  const [songToDownload, setSongToDownload] = useState<Song | null>(null);
 
   const addToast = (type: ToastMessage['type'], message: string) => {
     const id = Date.now().toString();
@@ -83,6 +87,29 @@ function App() {
 
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleDownloadSong = (song: Song) => {
+    setSongToDownload(song);
+    setDownloadDialogOpen(true);
+  };
+
+  const handleDownloadConfirm = async (quality: Quality) => {
+    if (!songToDownload) return;
+    try {
+      await downloadSong(
+        songToDownload.platform,
+        songToDownload.id,
+        songToDownload.name,
+        songToDownload.artist,
+        quality,
+      );
+      addToast('success', '下载成功');
+      setDownloadDialogOpen(false);
+      setSongToDownload(null);
+    } catch (error) {
+      addToast('error', error instanceof Error ? error.message : '下载失败');
+    }
   };
   const [keyword, setKeyword] = useState('');
   const [searchSource, setSearchSource] = useState<'aggregate' | Platform>('aggregate');
@@ -811,6 +838,7 @@ function App() {
               setShowLyrics(true);
             }
           }}
+          onDownload={currentSong ? () => handleDownloadSong(currentSong) : undefined}
         />
       }
       lyricsOverlay={
@@ -828,6 +856,12 @@ function App() {
               setRequestCloseLyrics(false);
             }}
             onSeek={handleSeek}
+            onDownload={currentSong ? (song) => {
+              // 先收起播放页，再弹出下载对话框，避免被遮挡
+              setShowLyrics(false);
+              setRequestCloseLyrics(false);
+              handleDownloadSong(song);
+            } : undefined}
           />
         )
       }
@@ -868,6 +902,7 @@ function App() {
               currentSong={currentSong}
               isPlaying={isPlaying}
               onPlay={playSong}
+              onDownload={handleDownloadSong}
               onClear={() => {
                 setKeyword('');
                 setSearchResults([]);
@@ -981,6 +1016,7 @@ function App() {
               isPlaying={isPlaying}
               onPlay={playSong}
               onPlayAll={() => startPlayback(viewingPlaylist.songs)}
+              onDownload={handleDownloadSong}
               onRename={playlists.some(p => p.id === viewingPlaylist.id) ? () => {
                 setPlaylistToRename(viewingPlaylist);
                 setRenamePlaylistName(viewingPlaylist.name);
@@ -1181,6 +1217,18 @@ function App() {
       >
         <p className="text-gray-300">确定要删除这个歌单吗？此操作无法撤销。</p>
       </Modal>
+
+      <DownloadDialog
+        isOpen={downloadDialogOpen}
+        onClose={() => {
+          setDownloadDialogOpen(false);
+          setSongToDownload(null);
+        }}
+        onConfirm={handleDownloadConfirm}
+        songName={songToDownload?.name || ''}
+        artist={songToDownload?.artist}
+        defaultQuality={quality}
+      />
     </Layout>
   );
 }

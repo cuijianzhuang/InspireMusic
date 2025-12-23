@@ -54,7 +54,7 @@ export const Select: React.FC<SelectProps> = ({ value, onChange, options, classN
             exit={{ opacity: 0, y: direction === 'down' ? -10 : 10 }}
             transition={{ duration: 0.15 }}
             className={clsx(
-              "absolute left-0 right-0 bg-surface border border-gray-800 rounded-md shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto custom-scrollbar",
+              "absolute left-0 right-0 bg-surface border border-gray-800 rounded-md shadow-xl z-[100] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar",
               direction === 'down' ? "top-full mt-1" : "bottom-full mb-1"
             )}
           >

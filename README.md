@@ -73,3 +73,26 @@
 # 构建命令，产物位于 /dist
 pnpm build
 ```
+
+## 🐳 Docker 一键部署
+
+### 快速开始
+
+**Linux/Mac:**
+```bash
+./docker-start.sh
+```
+
+**Windows:**
+```cmd
+docker-start.bat
+```
+
+**手动部署:**
+```bash
+docker-compose up -d
+```
+
+访问地址: http://localhost:3000
+
+详细部署说明请查看 [docker-deploy.md](./docker-deploy.md)

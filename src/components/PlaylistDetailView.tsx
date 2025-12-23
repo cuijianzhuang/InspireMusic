@@ -15,6 +15,7 @@ interface PlaylistDetailViewProps {
   isPlaying: boolean;
   onPlay: (song: Song) => void;
   onPlayAll: () => void;
+  onDownload?: (song: Song) => void;
   onRename?: () => void;
   onDelete?: () => void;
 }
@@ -25,6 +26,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
   isPlaying,
   onPlay,
   onPlayAll,
+  onDownload,
   onRename,
   onDelete,
 }) => {
@@ -116,6 +118,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
         currentSong={currentSong}
         isPlaying={isPlaying}
         onPlay={onPlay}
+        onDownload={onDownload}
       />
     </PageLayout>
   );
