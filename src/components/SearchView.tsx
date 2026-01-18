@@ -263,7 +263,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
 
       {/* Version & Copyright Info */}
       <div className="mt-15 mb-8 text-center">
-        <p className="text-xs text-white/40">Version v1.3.3 © 2025 WHSTU</p>
+        <p className="text-xs text-white/40">Version v1.3.3 © 2025 cuijianzhuang</p>
         <div className="mt-2 text-white/40 text-xs space-y-1.5 font-medium">
           <p>
             Powered by <a

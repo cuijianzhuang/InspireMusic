@@ -80,7 +80,8 @@ async function downloadInWeb(url: string, filename: string, source?: Platform): 
       const a = document.createElement('a');
       a.href = url;
       a.download = filename; // 虽然可能不生效，但保留以防浏览器支持
-      // 不设置 target，尽量避免打开新标签页
+      // 设置 target="_blank" 以防止在 CORS 重定向导致下载失败（变为播放）时覆盖当前页面
+      a.target = '_blank';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

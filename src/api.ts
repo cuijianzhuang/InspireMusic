@@ -14,7 +14,7 @@ import {
   saveToCache,
 } from './utils/cache';
 
-const BASE_URL = 'https://music-dl.sayqz.com';
+const BASE_URL = '/api';
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
@@ -83,7 +83,7 @@ export const searchSongs = async (
       platform: item.platform || source,
     })),
   };
-  
+
   // 保存到缓存
   saveToCache(cacheKey, result, CACHE_TTL.SEARCH);
   return result;
@@ -112,7 +112,7 @@ export const aggregateSearch = async (keyword: string, limit = 10, page = 1): Pr
       platform: item.platform || 'netease',
     })),
   };
-  
+
   // 保存到缓存
   saveToCache(cacheKey, result, CACHE_TTL.SEARCH);
   return result;
@@ -130,7 +130,7 @@ export const getSongInfo = async (source: Platform, id: string): Promise<SongInf
   const data = await handleResponse<{ code: number; data: SongInfo }>(
     await fetch(`${BASE_URL}${path}`),
   );
-  
+
   // 保存到缓存
   saveToCache(cacheKey, data.data, CACHE_TTL.SONG_INFO);
   return data.data;
@@ -146,7 +146,7 @@ export const getLyrics = async (source: Platform, id: string, lrcUrl?: string): 
 
   const path = buildPath({ source, id, type: 'lrc' });
   const lyrics = await fetchText(lrcUrl || `${BASE_URL}${path}`);
-  
+
   // 保存到缓存（歌词缓存7天）
   saveToCache(cacheKey, lyrics, CACHE_TTL.LYRICS);
   return lyrics;
@@ -168,7 +168,7 @@ export const getPlaylist = async (source: Platform, id: string): Promise<Playlis
     ...data.data,
     list: (data.data.list || []).map((item) => ({ ...item, platform: source })),
   };
-  
+
   // 保存到缓存
   saveToCache(cacheKey, result, CACHE_TTL.PLAYLIST);
   return result;
@@ -187,7 +187,7 @@ export const getToplists = async (source: Platform): Promise<ToplistSummary[]> =
     await fetch(`${BASE_URL}${path}`),
   );
   const result = data.data.list || [];
-  
+
   // 保存到缓存
   saveToCache(cacheKey, result, CACHE_TTL.TOPLISTS);
   return result;
@@ -212,7 +212,7 @@ export const getToplistSongs = async (
     source: data.data.source || source,
     list: (data.data.list || []).map((item) => ({ ...item, platform: data.data.source || source })),
   };
-  
+
   // 保存到缓存
   saveToCache(cacheKey, result, CACHE_TTL.TOPLIST_SONGS);
   return result;

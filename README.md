@@ -13,9 +13,9 @@
  3. 我们承诺，本项目：不存储版权资源、不提供下载功能、不以任何形式盈利。
  4. 在部分平台或服务器上部署此类项目，可能面临版权投诉，请遵守相关平台规则。
 
-## 📌 已知问题
+## 📌 注意事项
 
- 1. 受限于浏览器安全策略，部分资源无法在 https 生产环境中加载，但使用桌面端不受影响。
+ 1. **HTTPS 环境部署**：在 HTTPS 环境下部署需要配置反向代理以避免 Mixed Content 错误。详见下方「HTTPS 部署配置」章节。
  2. 我们暂未提供 Linux 或 Mac OS 的打包，但您可以使用 Tauri 自行打包和体验。
  3. 本项目没有在非 Chrome 内核的浏览器上进行测试，不保证完全正常的显示效果。
  4. 使用 Windows 桌面端需要 Webview2 支持，已知在 Windows 10（从版本 1803 开始）和更高版本的 Windows 上默认提供，如您使用其他 Windows 版本，请自行研究解决方案。
@@ -96,3 +96,82 @@ docker-compose up -d
 访问地址: http://localhost:3000
 
 详细部署说明请查看 [docker-deploy.md](./docker-deploy.md)
+
+## 🔒 HTTPS 部署配置
+
+在 HTTPS 环境下部署时，由于浏览器的 Mixed Content 安全策略，需要配置反向代理以确保所有资源通过 HTTPS 加载。
+
+### 前置要求
+
+1. 修改 `src/api.ts` 第 17 行：
+```typescript
+const BASE_URL = '/api';
+```
+
+2. 重新构建项目：
+```bash
+npm run build
+```
+
+### Nginx / OpenResty 配置
+
+在您的 Nginx 或 1Panel OpenResty 配置中添加以下 location 块（需要在主应用代理配置**之前**）：
+
+```nginx
+# API 反向代理配置
+location ^~ /api/ {
+    proxy_pass https://music-dl.sayqz.com/;
+    proxy_ssl_server_name on;
+    proxy_set_header Host music-dl.sayqz.com;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    
+    # 关键：将 HTTP 重定向转换为 HTTPS（解决 Mixed Content 问题）
+    proxy_redirect http:// https://;
+    
+    # 去掉 /api 前缀
+    rewrite ^/api/(.*)$ /$1 break;
+}
+
+# 您的应用主体配置
+location / {
+    # ... 您现有的配置
+}
+```
+
+### Caddy 配置
+
+```caddy
+yourdomain.com {
+    handle /api/* {
+        uri strip_prefix /api
+        reverse_proxy https://music-dl.sayqz.com
+    }
+    
+    handle {
+        root * /path/to/dist
+        file_server
+        try_files {path} /index.html
+    }
+}
+```
+
+### 验证配置
+
+1. 访问 `https://yourdomain.com/api/?source=netease&type=search&keyword=test`
+2. 应该返回 JSON 格式的搜索结果
+3. 浏览器 Console 不应出现 Mixed Content 错误
+4. 下载功能正常，不会跳转到新页面
+
+### 常见问题
+
+**Q: 配置后还是跳转到浏览器播放？**
+- 确认已修改 `src/api.ts` 并重新构建
+- 清除浏览器缓存（Ctrl+Shift+Delete）
+- 使用开发者工具 Network 标签检查请求 URL 是否为 `https://yourdomain.com/api/...`
+
+**Q: 出现 502 错误？**
+- 检查服务器是否能访问 `https://music-dl.sayqz.com`
+- 检查 DNS 解析是否正常
+
+更多配置细节和故障排查，请参考项目 Issues。
