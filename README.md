@@ -120,17 +120,17 @@ npm run build
 ```nginx
 # API 反向代理配置
 location ^~ /api/ {
-    proxy_pass https://music-dl.sayqz.com/;
+    proxy_pass https://music-dl.sayqz.com;
     proxy_ssl_server_name on;
     proxy_set_header Host music-dl.sayqz.com;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     
-    # 关键：将 HTTP 重定向转换为 HTTPS（解决 Mixed Content 问题）
+    # 将 HTTP 重定向转换为 HTTPS（解决 Mixed Content 问题）
     proxy_redirect http:// https://;
     
-    # 去掉 /api 前缀
-    rewrite ^/api/(.*)$ /$1 break;
+    # 优化大文件下载
+    proxy_buffering off;
 }
 
 # 您的应用主体配置

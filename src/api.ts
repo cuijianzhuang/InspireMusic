@@ -38,7 +38,7 @@ const buildPath = (params: Record<string, string | number | undefined>): string 
     .filter(([, value]) => value !== undefined && value !== '')
     .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
     .join('&');
-  return `/api/?${query}`;
+  return `/?${query}`;
 };
 
 export const buildFileUrl = (
@@ -53,6 +53,21 @@ export const buildFileUrl = (
   }
   const path = buildPath(query);
   return `${BASE_URL}${path}`;
+};
+
+/**
+ * 代理图片 URL 以解决 CORS 和 SSL 证书问题
+ * 将酷我音乐的图片 URL 替换为通过本地反向代理访问
+ */
+export const proxyImageUrl = (url: string | undefined): string | undefined => {
+  if (!url) return url;
+
+  // 如果是酷我的图片，替换为代理 URL
+  if (url.includes('kwcdn.kuwo.cn')) {
+    return url.replace(/https?:\/\/[^/]+\.kwcdn\.kuwo\.cn/, '/img-proxy/kuwo');
+  }
+
+  return url;
 };
 
 export const searchSongs = async (

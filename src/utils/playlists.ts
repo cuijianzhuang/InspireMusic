@@ -1,4 +1,4 @@
-import { buildFileUrl } from '../api';
+import { buildFileUrl, proxyImageUrl } from '../api';
 import type { LocalPlaylist, Platform, PlaylistData, Song } from '../types';
 
 export const FAVORITES_ID = 'favorites';
@@ -11,10 +11,10 @@ export const buildFavoritesPlaylist = (favorites: Song[]): LocalPlaylist => ({
 });
 
 export const getPlaylistCover = (playlist: LocalPlaylist): string | undefined => {
-  if (playlist.pic) return playlist.pic;
+  if (playlist.pic) return proxyImageUrl(playlist.pic);
   const firstSong = playlist.songs[0];
   if (!firstSong) return undefined;
-  return firstSong.pic || buildFileUrl(firstSong.platform, firstSong.id, 'pic');
+  return proxyImageUrl(firstSong.pic) || proxyImageUrl(buildFileUrl(firstSong.platform, firstSong.id, 'pic'));
 };
 
 interface ToLocalPlaylistOptions {

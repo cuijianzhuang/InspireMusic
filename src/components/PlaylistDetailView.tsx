@@ -6,7 +6,7 @@ import { CoverImage } from './ui/CoverImage';
 import { getGradientFromId } from '../utils/colors';
 import { FAVORITES_ID, FAVORITES_NAME, getPlaylistCover } from '../utils/playlists';
 import { PLATFORM_LABELS } from '../utils/platform';
-import { buildFileUrl } from '../api';
+import { buildFileUrl, proxyImageUrl } from '../api';
 import { PageLayout } from './ui/PageLayout';
 
 interface PlaylistDetailViewProps {
@@ -88,7 +88,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
         >
           <Play size={28} fill="black" className="text-black ml-1" />
         </button>
-        
+
         {onRename && playlist.id !== 'favorites' && (
           <button
             onClick={onRename}
@@ -113,7 +113,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
       <SongListPanel
         songs={playlist.songs.map(s => ({
           ...s,
-          pic: s.pic || buildFileUrl(s.platform, s.id, 'pic')
+          pic: proxyImageUrl(s.pic) || proxyImageUrl(buildFileUrl(s.platform, s.id, 'pic')) || ''
         }))}
         currentSong={currentSong}
         isPlaying={isPlaying}

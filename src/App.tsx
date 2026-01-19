@@ -7,6 +7,7 @@ import {
   getToplistSongs,
   getToplists,
   searchSongs,
+  proxyImageUrl,
 } from './api';
 import { useAppStore } from './store/useAppStore';
 import { useMediaSession } from './hooks/useMediaSession';
@@ -502,7 +503,7 @@ function App() {
       artist: song.artist || '',
       album: song.album || '',
       url: song.url || buildFileUrl(song.platform, song.id, 'url'),
-      pic: song.pic || buildFileUrl(song.platform, song.id, 'pic'),
+      pic: proxyImageUrl(song.pic) || proxyImageUrl(buildFileUrl(song.platform, song.id, 'pic')) || '',
       lrc: song.lrc || buildFileUrl(song.platform, song.id, 'lrc'),
     };
     setCurrentInfo(info);
