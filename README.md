@@ -1,3 +1,9 @@
+> [!WARNING]
+> 受限于服务器资源和风控压力，后端原作者修改了服务地址并引入鉴权，目前旧服务已无法使用！[点我查看原帖](https://linux.do/t/topic/1509257)
+
+> [!IMPORTANT]
+> 请等待本项目更新，或者自行适配新后端 [TuneHub V3](https://tunehub.sayqz.com/dashboard)
+
 # InspireMusic
 
 [在线体验](https://ins-music.netlify.app/) | [下载 Windows 桌面端](https://github.com/WHStudio/InspireMusic/releases/download/v1.3.3/InspireMusic_1.3.3_x64-setup.exe)
